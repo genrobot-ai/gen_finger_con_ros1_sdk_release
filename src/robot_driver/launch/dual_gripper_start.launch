@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- PYTHONPATH for scripts -->
+    <env name="PYTHONPATH" value="$(find robot_driver)/scripts:$(env PYTHONPATH)" />
+
+    <!-- Each gripper: 1 serial + 1 camera -->
+    <arg name="left_serial" default="/dev/ttyFingerLeft" />
+    <arg name="right_serial" default="/dev/ttyFingerRight" />
+    <arg name="left_video_device" default="/dev/finger_camera_left" />
+    <arg name="right_video_device" default="/dev/finger_camera_right" />
+    <arg name="camera_resolutions" default="1600x1296" />
+    <arg name="show_preview" default="true" />
+
+    <!-- ========== Left gripper ========== -->
+    <group ns="left_gripper">
+        <node name="camera" pkg="robot_driver" type="camera_view_single.py" output="screen">
+            <param name="resolutions" value="$(arg camera_resolutions)" />
+            <param name="topic_base" value="camera" />
+            <param name="show_preview" value="$(arg show_preview)" />
+            <param name="usb_port" value="$(arg left_serial)" />
+            <param name="camera_count" value="1" />
+            <param name="fps" value="60" />
+            <param name="video_device" value="$(arg left_video_device)" />
+        </node>
+
+        <node name="das_node" pkg="robot_driver" type="databus_single.py" output="screen" launch-prefix="bash -c 'sleep 3; $0 $@' ">
+            <env name="PYTHONPATH" value="$(find robot_driver)/scripts:$(env PYTHONPATH)" />
+            <param name="serial_port" value="$(arg left_serial)" />
+            <param name="topic_left_tactile" value="tactile/left" />
+            <param name="topic_right_tactile" value="tactile/right" />
+            <param name="topic_encoder" value="encoder" />
+            <param name="topic_target_distance" value="target_distance" />
+        </node>
+    </group>
+
+    <!-- ========== Right gripper ========== -->
+    <group ns="right_gripper">
+        <node name="camera" pkg="robot_driver" type="camera_view_single.py" output="screen">
+            <param name="resolutions" value="$(arg camera_resolutions)" />
+            <param name="topic_base" value="camera" />
+            <param name="show_preview" value="$(arg show_preview)" />
+            <param name="usb_port" value="$(arg right_serial)" />
+            <param name="camera_count" value="1" />
+            <param name="fps" value="60" />
+            <param name="video_device" value="$(arg right_video_device)" />
+        </node>
+
+        <node name="das_node" pkg="robot_driver" type="databus_single.py" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@' ">
+            <env name="PYTHONPATH" value="$(find robot_driver)/scripts:$(env PYTHONPATH)" />
+            <param name="serial_port" value="$(arg right_serial)" />
+            <param name="topic_left_tactile" value="tactile/left" />
+            <param name="topic_right_tactile" value="tactile/right" />
+            <param name="topic_encoder" value="encoder" />
+            <param name="topic_target_distance" value="target_distance" />
+        </node>
+    </group>
+</launch>
