@@ -16,7 +16,7 @@ License: [MIT License](LICENSE.txt)
 - finger 开合距离编码器反馈
 - 通过 ROS topic 控制 finger 开合
 - 单指 / 双指 launch 文件
-- 标定、设备 ID、编码器零点、触觉调试等工具脚本
+- 标定、设备 ID、触觉调试等工具脚本
 - Demo 脚本：将模型 `PoseStamped` 指令转换为夹爪 topic
 
 ## 2 环境要求

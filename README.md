@@ -16,7 +16,7 @@ License: [MIT License](LICENSE.txt)
 - Encoder feedback for finger opening distance
 - Finger distance control via ROS topics
 - Single-finger and dual-finger launch files
-- Utility scripts for calibration, device ID, encoder zeroing, and tactile debugging
+- Utility scripts for calibration, device ID, and tactile debugging
 - Demo scripts bridging model `PoseStamped` commands to gripper topics
 
 ## 2 Requirements
@@ -260,7 +260,7 @@ SERIAL_PORT=/dev/ttyFingerLeft bash camera_cmd.sh MCUID
 | No camera preview               | Check udev camera symlinks; verify with `v4l2-ctl --list-devices` |
 | Device utility command fails    | Stop `roslaunch` and other control nodes before running utilities |
 
-## 9 Documentation
+## 9 Documentation Index
 
 | Description         | Link                                                                                     |
 | ------------------- | ---------------------------------------------------------------------------------------- |
