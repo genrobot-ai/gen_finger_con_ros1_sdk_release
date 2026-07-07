@@ -222,7 +222,6 @@ roscore
 cd src/robot_driver/scripts/
 bash camera_cmd.sh camerarc   # Camera calibration (single camera)
 bash camera_cmd.sh MCUID      # Device ID
-bash camera_cmd.sh DMZEROSET  # Encoder zero setting
 python3 tactile_dual_print.py # Print tactile data
 ```
 
@@ -234,12 +233,10 @@ cd src/robot_driver/scripts/
 
 bash camera_cmd.sh left camerarc
 bash camera_cmd.sh left MCUID
-bash camera_cmd.sh left DMZEROSET
 python3 tactile_dual_print.py _gripper_ns:=left_gripper
 
 bash camera_cmd.sh right camerarc
 bash camera_cmd.sh right MCUID
-bash camera_cmd.sh right DMZEROSET
 python3 tactile_dual_print.py _gripper_ns:=right_gripper
 ```
 

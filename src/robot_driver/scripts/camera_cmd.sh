@@ -5,15 +5,9 @@ set -euo pipefail
 #   Single device:
 #     bash camera_cmd.sh 1234
 #     bash camera_cmd.sh camerarc
-#     bash camera_cmd.sh camerarl
-#     bash camera_cmd.sh camerarr
 #     bash camera_cmd.sh MCUID
-#     bash camera_cmd.sh DMZEROSET
 #   Dual device (left/right):
 #     bash camera_cmd.sh left camerarc
-#     bash camera_cmd.sh right camerarl
-#     bash camera_cmd.sh right camerarr
-#     bash camera_cmd.sh left DMZEROSET
 # Optional: set SERIAL_PORT to force a device; otherwise use udev-mapped /dev/ttyFinger*.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,8 +15,8 @@ export PYTHONPATH="${SCRIPT_DIR}:${PYTHONPATH:-}"
 
 usage() {
   echo "Usage:"
-  echo "  Single: bash ${BASH_SOURCE[0]} {1234|camerarc|camerarl|camerarr|MCUID|DMZEROSET}"
-  echo "  Dual:   bash ${BASH_SOURCE[0]} {left|right} {camerarc|camerarl|camerarr|MCUID|DMZEROSET|1234}"
+  echo "  Single: bash ${BASH_SOURCE[0]} {1234|camerarc|MCUID}"
+  echo "  Dual:   bash ${BASH_SOURCE[0]} {left|right} {camerarc|MCUID|1234}"
   echo "Optional env: SERIAL_PORT=/dev/ttyFingerLeft"
   exit 1
 }
@@ -44,10 +38,10 @@ fi
 
 # Validate RECORD_VALUE
 case "${RECORD_VALUE}" in
-  1234|camerarc|camerarl|camerarr|MCUID|DMZEROSET)
+  1234|camerarc|MCUID)
     ;;
   *)
-    echo "Error: second argument must be one of 1234/camerarc/camerarl/camerarr/MCUID/DMZEROSET"
+    echo "Error: second argument must be one of 1234/camerarc/MCUID"
     usage
     ;;
 esac
@@ -68,10 +62,6 @@ fi
 yaml_filename=""
 if [[ "${RECORD_VALUE}" == "camerarc" ]]; then
   yaml_filename="cam0_sensor.yaml"
-elif [[ "${RECORD_VALUE}" == "camerarl" ]]; then
-  yaml_filename="cam1_sensor.yaml"
-elif [[ "${RECORD_VALUE}" == "camerarr" ]]; then
-  yaml_filename="cam2_sensor.yaml"
 fi
 
 if [[ -n "${SIDE}" && -n "${yaml_filename}" ]]; then
@@ -115,12 +105,12 @@ if not serial_port:
 print(f"Using serial: {serial_port}")
 print(f"Sending camera calib command: {record_value}")
 
-# MCUID/DMZEROSET print payload between das\\r\\n or Echo record
+# MCUID prints payload between das\\r\\n or Echo record
 bus = DataBus(tty_port=serial_port, baudrate=921600, is_calib_cmd=True, calib_cmd_name=record_value)
 time.sleep(1.0)
 bus.add_cmd(CmdPack.pack_calib(record=record_bytes))
 
-if record_value in ("MCUID", "DMZEROSET"):
+if record_value == "MCUID":
     bus.wait_for_calib_response(timeout=3.0)
 elif record_value.startswith("camera"):
     bus.wait_for_calib_response(timeout=2.0)
@@ -133,8 +123,6 @@ if record_value == "1234":
     print("Calibration OK !")
 elif record_value == "MCUID":
     print("MCUID query executed")
-elif record_value == "DMZEROSET":
-    print("DMZEROSET command executed")
 else:
     print(f"Finished sending command: {record_value}")
 
