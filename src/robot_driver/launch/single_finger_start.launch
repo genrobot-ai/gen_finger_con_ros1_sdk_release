@@ -3,7 +3,7 @@
     <!-- PYTHONPATH for scripts -->
     <env name="PYTHONPATH" value="$(find robot_driver)/scripts:$(env PYTHONPATH)" />
 
-    <!-- Each gripper: 1 serial + 1 camera -->
+    <!-- Each finger: 1 serial + 1 camera -->
     <arg name="serial" default="/dev/ttyFingerLeft" />
     <arg name="video_device" default="/dev/finger_camera_left" />
     <arg name="camera_resolutions" default="1600x1296" />

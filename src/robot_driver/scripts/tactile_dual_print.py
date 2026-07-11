@@ -16,23 +16,23 @@ def _normalize_ns(ns):
 
 
 def _topic(ns, tactile_name):
-    """ ns=left_gripper, tactile_name=left -> /left_gripper/tactile/left"""
+    """ ns=left_finger, tactile_name=left -> /left_finger/tactile/left"""
     n = _normalize_ns(ns)
     return "/{}/tactile/{}".format(n, tactile_name)
 
 
 class TactileDualPrinter:
     def __init__(self):
-        gripper_ns = rospy.get_param("~gripper_ns", "left_gripper")
+        finger_ns = rospy.get_param("~finger_ns", "left_finger")
         hz = float(rospy.get_param("~print_hz", 30.0))
-        self._topic_left = _topic(gripper_ns, "left")
-        self._topic_right = _topic(gripper_ns, "right")
+        self._topic_left = _topic(finger_ns, "left")
+        self._topic_right = _topic(finger_ns, "right")
 
         self._lock = threading.Lock()
         self._data_left = None
         self._data_right = None
 
-        rospy.loginfo("gripper_ns=%s", gripper_ns)
+        rospy.loginfo("finger_ns=%s", finger_ns)
         rospy.loginfo("subscribe tactile/left:  %s", self._topic_left)
         rospy.loginfo("subscribe tactile/right: %s", self._topic_right)
 

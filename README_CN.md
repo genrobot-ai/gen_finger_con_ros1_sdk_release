@@ -42,7 +42,7 @@ git clone https://github.com/genrobot-ai/gen_finger_con_ros1_sdk_release.git
 cd gen_finger_con_ros1_sdk_release
 catkin_make
 source devel/setup.bash
-roslaunch robot_driver single_gripper_start.launch
+roslaunch robot_driver single_finger_start.launch
 ```
 
 验证反馈并发送控制指令：
@@ -83,18 +83,18 @@ rostopic pub /target_distance std_msgs/Float32 "data: 0.05"
 
 ### 4.2 双指
 
-所有 topic 以 `/left_gripper` 或 `/right_gripper` 为命名空间前缀。例如：
+所有 topic 以 `/left_finger` 或 `/right_finger` 为命名空间前缀。例如：
 
 
 | Topic                            | 类型                 | 方向  | 说明            |
 | -------------------------------- | ------------------ | --- | ------------- |
-| `/left_gripper/encoder`          | `std_msgs/Float32` | 发布  | 左 finger 开合反馈 |
-| `/left_gripper/target_distance`  | `std_msgs/Float32` | 订阅  | 左 finger 目标距离 |
-| `/right_gripper/encoder`         | `std_msgs/Float32` | 发布  | 右 finger 开合反馈 |
-| `/right_gripper/target_distance` | `std_msgs/Float32` | 订阅  | 右 finger 目标距离 |
+| `/left_finger/encoder`           | `std_msgs/Float32` | 发布  | 左 finger 开合反馈 |
+| `/left_finger/target_distance`   | `std_msgs/Float32` | 订阅  | 左 finger 目标距离 |
+| `/right_finger/encoder`          | `std_msgs/Float32` | 发布  | 右 finger 开合反馈 |
+| `/right_finger/target_distance`  | `std_msgs/Float32` | 订阅  | 右 finger 目标距离 |
 
 
-相机与触觉 topic 遵循相同命名空间规则（如 `/left_gripper/camera/...`、`/left_gripper/tactile/...` 等）。
+相机与触觉 topic 遵循相同命名空间规则（如 `/left_finger/camera/...`、`/left_finger/tactile/...` 等）。
 
 ### 4.3 Launch 参数
 
@@ -193,14 +193,14 @@ ls -l /dev/ttyFingerRight /dev/finger_camera_right
 
 ```shell
 source devel/setup.bash
-roslaunch robot_driver single_gripper_start.launch
+roslaunch robot_driver single_finger_start.launch
 ```
 
 可选 launch 参数：
 
 ```shell
-roslaunch robot_driver single_gripper_start.launch show_preview:=false
-roslaunch robot_driver single_gripper_start.launch serial:=/dev/ttyFingerLeft video_device:=/dev/finger_camera_left
+roslaunch robot_driver single_finger_start.launch show_preview:=false
+roslaunch robot_driver single_finger_start.launch serial:=/dev/ttyFingerLeft video_device:=/dev/finger_camera_left
 ```
 
 启动后弹出一个图像窗口，输出 topic：
@@ -219,7 +219,7 @@ launch 文件默认 `<param name="fps" value="60" />`。若旧设备帧率异常
 
 ```shell
 source devel/setup.bash
-roslaunch robot_driver dual_gripper_start.launch
+roslaunch robot_driver dual_finger_start.launch
 ```
 
 启动后弹出两个图像预览窗口（每指一个）。
@@ -232,14 +232,15 @@ python3 left_das_controller_infer.py
 python3 right_das_controller_infer.py
 ```
 
-- `left_das_controller_infer.py`：订阅 `/target_gripper/left_gripper`，发布 `/left_gripper/target_distance`；订阅 `/left_gripper/encoder`，发布 `/gripper/left/current_distance`
-- `right_das_controller_infer.py`：订阅 `/target_gripper/right_gripper`，发布 `/right_gripper/target_distance`；订阅 `/right_gripper/encoder`，发布 `/gripper/right/current_distance`
+- `left_das_controller_infer.py`：订阅 `/target_finger/left_finger`，发布 `/left_finger/target_distance`；订阅 `/left_finger/encoder`，发布 `/finger/left/current_distance`
+- `right_das_controller_infer.py`：订阅 `/target_finger/right_finger`，发布 `/right_finger/target_distance`；订阅 `/right_finger/encoder`，发布 `/finger/right/current_distance`
 
 
 
 ### 7.3 设备工具命令
 
-以下命令需先启动 `roscore`。运行期间**不要**同时启动 `roslaunch` 或其他控制节点。
+运行 `camera_cmd.sh` 相关命令前需先启动 `roscore`。请在一个终端中先运行 `roscore`，再在另一个终端中运行下面的工具命令。运行期间**不要**同时启动 `roslaunch` 或其他控制节点。
+
 
 **单设备：**
 
@@ -259,11 +260,11 @@ cd src/robot_driver/scripts/
 
 bash camera_cmd.sh left camerarc
 bash camera_cmd.sh left MCUID
-python3 tactile_dual_print.py _gripper_ns:=left_gripper
+python3 tactile_dual_print.py _finger_ns:=left_finger
 
 bash camera_cmd.sh right camerarc
 bash camera_cmd.sh right MCUID
-python3 tactile_dual_print.py _gripper_ns:=right_gripper
+python3 tactile_dual_print.py _finger_ns:=right_finger
 ```
 
 finger 新设备只有 1 个相机，常用标定命令为 `camerarc`。标定 YAML 文件保存至 `calib_result/`（如 `cam0_sensor.yaml`、`left_cam0_sensor.yaml`）。
@@ -300,8 +301,8 @@ SERIAL_PORT=/dev/ttyFingerLeft bash camera_cmd.sh MCUID
 | USB 配置 (ZH)    | [docs/usb-setup_CN.md](docs/usb-setup_CN.md)                                       |
 | USB setup (EN) | [docs/usb-setup.md](docs/usb-setup.md)                                             |
 | udev 规则模板      | [config/99-usb-serial.rules](config/99-usb-serial.rules)                           |
-| 单指 launch      | [single_gripper_start.launch](src/robot_driver/launch/single_gripper_start.launch) |
-| 双指 launch      | [dual_gripper_start.launch](src/robot_driver/launch/dual_gripper_start.launch)     |
+| 单指 launch      | [single_finger_start.launch](src/robot_driver/launch/single_finger_start.launch) |
+| 双指 launch      | [dual_finger_start.launch](src/robot_driver/launch/dual_finger_start.launch)     |
 | 标定辅助脚本         | [camera_cmd.sh](src/robot_driver/scripts/camera_cmd.sh)                            |
 | 驱动脚本           | [src/robot_driver/scripts/](src/robot_driver/scripts/)                             |
 

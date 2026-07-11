@@ -274,7 +274,7 @@ class DataBus:
         self.encoder_thread: threading.Thread = None
         self.tactile_thread: threading.Thread = None
         
-        self.gripper_dis = 0.0
+        self.finger_dis = 0.0
         self.angle_lock = threading.Lock()
         # Camera calib flag / name (e.g. MCUID prints payload between das\\r\\n)
         self.is_calib_cmd = is_calib_cmd  # default False
@@ -303,7 +303,7 @@ class DataBus:
 
     def _init_ros_subscribers(self):
         """Init ROS subscribers."""
-        # Gripper open distance command
+        # Finger open distance command
         self.motor_cmd_subscriber = rospy.Subscriber(
             TOPIC_TARGET_DISTANCE, 
             Float32, 
@@ -314,7 +314,7 @@ class DataBus:
     def _motor_command_callback(self, msg):
         try:
             with self.angle_lock:
-                self.gripper_dis = msg.data
+                self.finger_dis = msg.data
             # print(f"Target distance cmd: {msg.data} m")
         except Exception as e:
             print(f"Motor command handling error: {e}")
@@ -571,7 +571,7 @@ class DataBus:
             
             # Distance command to motor
             with self.angle_lock:
-                dis_target = self.gripper_dis
+                dis_target = self.finger_dis
             
             self.add_cmd(
                 CmdPack.pack(

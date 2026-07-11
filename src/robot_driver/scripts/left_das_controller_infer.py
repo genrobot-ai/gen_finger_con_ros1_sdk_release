@@ -4,7 +4,7 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float32
 
-class GripperDataConverter:
+class FingerDataConverter:
     def __init__(self):
         rospy.init_node('das_controller_converter', anonymous=True)
         
@@ -12,31 +12,31 @@ class GripperDataConverter:
         self.latest_left_data = None
         self.latest_left_cmd = None
         
-        rospy.Subscriber('/left_gripper/encoder', Float32, self.left_gripper_data_callback)
-        self.left_gripper_feedback_pub = rospy.Publisher('/gripper/left/current_distance', PoseStamped, queue_size=10)      
+        rospy.Subscriber('/left_finger/encoder', Float32, self.left_finger_data_callback)
+        self.left_finger_feedback_pub = rospy.Publisher('/finger/left/current_distance', PoseStamped, queue_size=10)      
 
-        rospy.Subscriber('/target_gripper/left_gripper', PoseStamped, self.left_cmd_callback)
-        self.left_gripper_cmd_pub = rospy.Publisher('/left_gripper/target_distance', Float32, queue_size=10)
+        rospy.Subscriber('/target_finger/left_finger', PoseStamped, self.left_cmd_callback)
+        self.left_finger_cmd_pub = rospy.Publisher('/left_finger/target_distance', Float32, queue_size=10)
 
-        rospy.loginfo("Gripper Data Converter Node Started")
+        rospy.loginfo("Finger Data Converter Node Started")
         rospy.loginfo(f"Publish rate: {self.publish_rate}Hz")
     
-    def left_gripper_data_callback(self, msg):
-        """Store latest left gripper feedback."""
+    def left_finger_data_callback(self, msg):
+        """Store latest left finger feedback."""
         self.latest_left_data = msg
     
-    def process_gripper_feedback(self, gripper_msg, publisher, gripper_name):
+    def process_finger_feedback(self, finger_msg, publisher, finger_name):
         """Convert Float32 distance to PoseStamped for the model."""
         pose_msg = PoseStamped()
         
-        if hasattr(gripper_msg, 'header') and gripper_msg.header.stamp:
-            pose_msg.header.stamp = gripper_msg.header.stamp
+        if hasattr(finger_msg, 'header') and finger_msg.header.stamp:
+            pose_msg.header.stamp = finger_msg.header.stamp
         else:
             pose_msg.header.stamp = rospy.Time.now()
             
-        pose_msg.header.frame_id = f"{gripper_name}_gripper_frame"
+        pose_msg.header.frame_id = f"{finger_name}_finger_frame"
         
-        pose_msg.pose.position.x = gripper_msg.data
+        pose_msg.pose.position.x = finger_msg.data
         pose_msg.pose.position.y = 0.0
         pose_msg.pose.position.z = 0.0
         
@@ -48,31 +48,31 @@ class GripperDataConverter:
         publisher.publish(pose_msg)
 
         # Used during calibration
-        # self.left_gripper_cmd_pub.publish(0.1)
+        # self.left_finger_cmd_pub.publish(0.1)
         
-        rospy.loginfo(f"Published {gripper_name} feedback distance: {gripper_msg.data}")
+        rospy.loginfo(f"Published {finger_name} feedback distance: {finger_msg.data}")
 
     def left_cmd_callback(self, msg):
-        """Store latest left gripper command."""
+        """Store latest left finger command."""
         self.latest_left_cmd = msg
     
-    def process_gripper_cmd(self, pos_msg, publisher, gripper_name):
+    def process_finger_cmd(self, pos_msg, publisher, finger_name):
         """PoseStamped -> Float32 target_distance."""
-        gripper_cmd_msg = Float32()
+        finger_cmd_msg = Float32()
         
-        gripper_cmd_msg.data = pos_msg.pose.position.x
+        finger_cmd_msg.data = pos_msg.pose.position.x
         
-        publisher.publish(gripper_cmd_msg)
+        publisher.publish(finger_cmd_msg)
         
-        # rospy.loginfo(f"Published {gripper_name} command distance: {pos_msg.pose.position.x}")
+        # rospy.loginfo(f"Published {finger_name} command distance: {pos_msg.pose.position.x}")
     
     def publish_all_data(self):
         """Publish at fixed rate."""
         if self.latest_left_data is not None:
-            self.process_gripper_feedback(self.latest_left_data, self.left_gripper_feedback_pub, "left")
+            self.process_finger_feedback(self.latest_left_data, self.left_finger_feedback_pub, "left")
         
         if self.latest_left_cmd is not None:
-            self.process_gripper_cmd(self.latest_left_cmd, self.left_gripper_cmd_pub, "left")
+            self.process_finger_cmd(self.latest_left_cmd, self.left_finger_cmd_pub, "left")
     
     def run(self):
         rate = rospy.Rate(self.publish_rate)
@@ -82,7 +82,7 @@ class GripperDataConverter:
 
 if __name__ == '__main__':
     try:
-        converter = GripperDataConverter()
+        converter = FingerDataConverter()
         converter.run()
     except rospy.ROSInterruptException:
         pass

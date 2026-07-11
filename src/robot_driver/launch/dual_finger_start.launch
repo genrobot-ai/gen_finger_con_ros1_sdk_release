@@ -3,7 +3,7 @@
     <!-- PYTHONPATH for scripts -->
     <env name="PYTHONPATH" value="$(find robot_driver)/scripts:$(env PYTHONPATH)" />
 
-    <!-- Each gripper: 1 serial + 1 camera -->
+    <!-- Each finger: 1 serial + 1 camera -->
     <arg name="left_serial" default="/dev/ttyFingerLeft" />
     <arg name="right_serial" default="/dev/ttyFingerRight" />
     <arg name="left_video_device" default="/dev/finger_camera_left" />
@@ -11,8 +11,8 @@
     <arg name="camera_resolutions" default="1600x1296" />
     <arg name="show_preview" default="true" />
 
-    <!-- ========== Left gripper ========== -->
-    <group ns="left_gripper">
+    <!-- ========== Left finger ========== -->
+    <group ns="left_finger">
         <node name="camera" pkg="robot_driver" type="camera_view_single.py" output="screen">
             <param name="resolutions" value="$(arg camera_resolutions)" />
             <param name="topic_base" value="camera" />
@@ -33,8 +33,8 @@
         </node>
     </group>
 
-    <!-- ========== Right gripper ========== -->
-    <group ns="right_gripper">
+    <!-- ========== Right finger ========== -->
+    <group ns="right_finger">
         <node name="camera" pkg="robot_driver" type="camera_view_single.py" output="screen">
             <param name="resolutions" value="$(arg camera_resolutions)" />
             <param name="topic_base" value="camera" />
